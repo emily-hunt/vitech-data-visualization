@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title></title>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<style>
+    svg {
+        font-family: Helvetica, Arial, sans-serif;
+    }
+</style>
+<body>
+<script>
+
+var width = 1200,
+    height = 2000;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("background-color", '#000');
+    //.attr("preserveAspectRatio", "xMinYMin meet")
+   //.attr("viewBox", "0 0 600 400")
+   //class to make it responsive
+   //.classed("svg-content-responsive", true); 
+
+var numberOfButtons = 4;
+
+var x = d3.scale.linear()
+    .domain([0,numberOfButtons+1])
+    .range([0,width]);
+
+var buttons = d3.range(numberOfButtons).map(function(d,i) {
+    return { id: i+1, x: x(i+1), y: height/2 - 500 }
+});
+
+var changeRad = 1;
+var pl = "Platinum";
+
+
+buttonGroup
+var buttonGroup = svg.selectAll("g")
+    .data(buttons)
+  .enter().append("g")
+    .attr("transform", function(d) { return "translate("+d.x+","+d.y+")"; });
+
+var miniButtons = svg.selectAll("g")
+    .data(buttons)
+  .enter().append("g")
+    .attr("transform", function(d) { return "translate("+d.x+","+d.y+")"; });
+
+buttonGroup.append("image")
+            .attr("xlink:href", "results.png")
+            .attr("x", function(d,i) { return -i*1500-150; })
+            .attr("y", -310)
+            .attr("width", 1000)
+            .attr("height", 250);
+
+buttonGroup.append("circle")
+    .attr("r", 50)
+    .attr("fill", function(d, i) {
+        if (d.id == "1"){
+            return '#f22a25';
+        } else if (d.id == "2"){
+            return '#f44336';
+        } else if (d.id == "3") {
+            return '#f2605c';
+        } else if (d.id == "4") {
+            return '#f48784';
+        }
+
+    })
+    .attr("cursor", "pointer")
+    .on("mouseover", function(d,i) {
+        d3.select(this).transition()
+            .ease("elastic")
+            .duration("600")
+            .attr("r", 100);
+        d3.select("#clipCircle"+i+" circle").transition()
+            .ease("cubic-out")
+            .duration("500")
+            .attr("r", 97);
+        d3.select("#text"+i).transition()
+            .ease("cubic-out")
+            .duration("500")
+            .attr("y", 12)
+            .attr("font-size", 0)
+            .attr("fill", "#000");
+        // d3.select("#changeRad")
+        //     .attr("value", 2);
+    
+        miniButtons.append("circle")
+            .attr("r", 50)
+            .attr("x", 100)
+            .attr("y", 200);
+
+    })
+    .on("mouseout", function(d,i) {
+        d3.select(this).transition()
+            .ease("quad")
+            .delay("100")
+            .duration("500")
+            .attr("r", 50);
+        d3.select("#clipCircle"+i+" circle").transition()
+            .ease("quad")
+            .delay("100")
+            .duration("500")
+            .attr("r", 0);
+        d3.select("#text"+i).transition()
+            .ease("cubic-out")
+            .duration("500")
+            .delay("100")
+            .attr("y", 7)
+            .attr("font-size", 20)
+            .attr("fill", "#FFF");
+    } );
+
+buttonGroup.append("clipPath")
+    .attr("id", function(d, i) { return "clipCircle" + i; })
+    .append("circle")
+    .attr("r", 0);
+
+buttonGroup.append("image")
+    .attr("xlink:href", function(d,i) { if (d.id == "1") {
+                                            return "platinum.png";
+                                        } else if (d.id == "2") {
+                                            return "gold.png";
+                                        } else if (d.id == "3") {
+                                            return "silver.png";
+                                        } else if (d.id == "4") {
+                                            return "bronze.png";
+                                        } })
+    .attr("id", function(d,i) { return "image"+i; })
+    .attr("clip-path", function(d,i) { return "url(#clipCircle"+i+")"; })
+    .attr("y", -100)
+    .attr("width", numberOfButtons*100)
+    .attr("x", function(d,i) { return -i-190; })
+    .attr("height", 225)
+    .attr("pointer-events", "none");
+
+buttonGroup.append("text")
+    .text(function(d) { 
+                        if (d.id == "1") {
+                            return pl;
+                        } else if (d.id == "2") {
+                            return "Gold";
+                        } else if (d.id == "3") {
+                            return "Silver";
+                        } else if (d.id == "4") {
+                            return "Bronze";
+                        }
+                    })
+    .attr("text-anchor", "middle")
+    .attr("y", 7)
+    .attr("id", function(d, i) { return "text" + i; })
+    .attr("font-size", "20px")
+    .attr("fill", "#FFF")
+    .attr("pointer-events", "none");
+
+buttonGroup.append("clipPath")       // define a clip path
+    .attr("id", "ellipse-clip") // give the clipPath an ID
+    .append("ellipse")          // shape it as an ellipse
+    .attr("cx", 0)         // position the x-centre
+    .attr("cy", 150)         // position the y-centre
+    .attr("rx", changeRad*30)
+    .attr("ry", changeRad*30);
+
+buttonGroup.append("text")
+                    .text("According to our calculations...")
+                    .attr("x",function(d,i) { return -i*900-190; })
+                    .attr("y",-400)
+                    .attr("fill", "#FFF")
+                    .style("font-weight", "bold")
+                    .attr("font-size", "36px");
+buttonGroup.append("text")
+                    .text("Based on your answers it looks like you'll need the Bronze plan")
+                    .attr("x",function(d,i) { return -i*1500-190; })
+                    .attr("y",-350)
+                    .attr("fill", "#FFF")
+                    .attr("font-size", "18px");
+buttonGroup.append("text")
+                    .text("to ensure all your needs are taken care of.")
+                    .attr("x",function(d,i) { return -i*1500-190; })
+                    .attr("y",-330)
+                    .attr("fill", "#FFF")
+                    .attr("font-size", "18px");
+
+
+</script>
+
+</body>
+ 
